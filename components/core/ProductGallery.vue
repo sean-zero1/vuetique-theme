@@ -73,7 +73,9 @@ import VueOfflineMixin from 'vue-offline/mixin'
 export default {
   components: {
     'no-ssr': NoSSR,
-    ProductGalleryZoom
+    ProductGalleryZoom,
+    'Carousel': () => import('vue-carousel').then(Slider => Slider.Carousel),
+    'Slide': () => import('vue-carousel').then(Slider => Slider.Slide)
   },
   mixins: [ProductGallery, VueOfflineMixin],
   watch: {
@@ -81,12 +83,30 @@ export default {
   },
   data () {
     return {
-      loaded: true
+      isZoomOpen: false,
+      loaded: true,
+      currentPage: null,
+      carouselTransitionSpeed: 0
     }
   },
   methods: {
+    openOverlay (currentSlide) {
+      this.currentSlide = currentSlide
+      this.toggleZoom()
+    },
+    toggleZoom () {
+      this.isZoomOpen = !this.isZoomOpen
+    },
+    onEscapePress () {
+      if (this.isZoomOpen) {
+        this.toggleZoom()
+      }
+    },
     validateRoute () {
       this.$forceUpdate()
+    },
+    onPageChange (page) {
+      this.$emit('page-change', page)
     }
   }
 }
